@@ -1,23 +1,26 @@
 {
   "name": "ft-transcendence-backend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "@prisma/client": "^5.18.0",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "bcrypt": "^5.1.1",
+    "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "socket.io": "^4.7.5",
-    "@prisma/client": "^5.16.1"
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
-    "prisma": "^5.16.1"
+    "prisma": "^5.18.0"
   }
 }
