@@ -1,48 +1,29 @@
-import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { createServer } from "http";
+import dotenv from "dotenv";
+import http from "http";
 import { Server } from "socket.io";
-import { PrismaClient } from "@prisma/client";
 
-const PORT = process.env.PORT || 3001;
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
+dotenv.config();
 
 const app = express();
-app.use(cors({ origin: FRONTEND_ORIGIN }));
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
+
+app.use(cors());
 app.use(express.json());
 
-const prisma = new PrismaClient();
-
-// --- Health check (also used by docker-compose's healthcheck) ---
-app.get("/health", async (req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({ status: "ok", db: "connected" });
-  } catch (err) {
-    res.status(503).json({ status: "degraded", db: "unreachable" });
-  }
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
-// TODO: mount real routers here as you build them, e.g.
-// app.use("/api/auth", authRouter);
-// app.use("/api/tracks", tracksRouter);   <- or your actual game/user routes
-
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: { origin: FRONTEND_ORIGIN },
-});
+// Tameem: mount /auth, /users, /friends routers here as they're built
 
 io.on("connection", (socket) => {
-  console.log(`socket connected: ${socket.id}`);
-
-  socket.on("disconnect", () => {
-    console.log(`socket disconnected: ${socket.id}`);
-  });
-
-  // TODO: real-time game/chat events go here
+  console.log(`Socket connected: ${socket.id}`);
 });
 
-httpServer.listen(PORT, () => {
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
   console.log(`Backend listening on port ${PORT}`);
 });
